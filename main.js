@@ -3,6 +3,9 @@ const app=express()
 const path=require("node:path")
 const session=require("express-session")
 
+const homeRouter=require("./routes/homeRoute")
+const signin=require("./routes/signinRuter")
+
 app.use(express.urlencoded({extended:true}))
 app.set("views",path.join(__dirname,"views"))
 app.set("view engine","ejs")
@@ -12,9 +15,8 @@ app.use(session({
      saveUninitialized:false
 }))
 
-app.get("/",(req,res)=>{
-   res.render('home')
-})
+app.use("/",homeRouter)
+app.use("/signin",signin)
 
 
 const port=process.env.PORT ||8000
