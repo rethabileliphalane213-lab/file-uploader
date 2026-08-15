@@ -5,6 +5,8 @@ const session=require("express-session")
 
 const homeRouter=require("./routes/homeRoute")
 const signin=require("./routes/signinRuter")
+const login=require("./routes/loginRouter")
+const { log } = require("node:console")
 
 app.use(express.urlencoded({extended:true}))
 app.set("views",path.join(__dirname,"views"))
@@ -17,6 +19,7 @@ app.use(session({
 
 app.use("/",homeRouter)
 app.use("/signin",signin)
+app.use("/login",login)
 
 
 const port=process.env.PORT ||8000
