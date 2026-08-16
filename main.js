@@ -4,6 +4,7 @@ const path=require("node:path")
 const session=require("express-session")
 const passport=require("passport")
 const localStrategy=require("passport-local").Strategy
+const bcrypt=require("bcryptjs")
 
 
 
@@ -32,7 +33,7 @@ app.use("/login",login)
 
 passport.use(new localStrategy({usernameField:"email"},async(email,password,done)=>{
 try{
-const {rows}=con.query("SELECT * FROM user WHERE email=$1",[email])
+const {rows}=await con.query("SELECT * FROM users WHERE email=$1",[email])
 const emailFound=rows[0]
 if(!emailFound){
     return done(null,false,{error:"Incorrect Email"})
@@ -42,7 +43,7 @@ const passwordMatch=await bcrypt.compare(password,emailFound.password)
 if(!passwordMatch){
     return done(null,false,{error:"Incorrect Password"})
 }
-return done(null,user)
+return done(null,emailFound)
 
 }catch(error){
     return done(error)
@@ -54,7 +55,7 @@ passport.serializeUser((user,done)=>{
 passport.deserializeUser(async(id,done)=>{
 
     try{
- const {rows}=con.query("SELECT * FROM user WHERE user_id=$1",[id])
+ const {rows}=await con.query("SELECT * FROM users WHERE user_id=$1",[id])
  const user=rows[0]
  done(null,user)
     }catch(error){

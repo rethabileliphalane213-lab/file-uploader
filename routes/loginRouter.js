@@ -14,17 +14,11 @@ logInRouter.get("/",(req,res)=>{
 })
 
 logInRouter.post("/",(req,res,next)=>{
-passport.authenticate("local",(error,user)=>{
-    if(error){
-        res.status(404).send("Internal error!Account not Found")
-    }
-    req.logIn(errr=>{
-        if(errr){
-            return next(errr)
-        }
-        return res.redirect("/")
-    })
-})
+passport.authenticate("local",{
+    successRedirect:"/",
+    failureRedirect:"/login",
+    failureFlash:false
+})(req,res,next)
 })
 
 module.exports=logInRouter
