@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+main.js
+
+
+
+const express=require("express")
+const app=express()
+
+const {Pool}=require("pg")
+const {Client}=require("pg")
+
+const path=require("node:path")
+app.set("views", path.join(__dirname, "views"))
+app.use(express.static(path.join(__dirname,'public')))
+app.set("view engine","ejs")
+app.use(express.urlencoded({extended:true}))
+
+
+const queries=require("./db/queries")
+const all_games = require("./db/queries")
+
+const con=new Pool({
+    user:"postgres",
+    host:"localhost",
+    port:5432,
+    password:"rethabilenongs",
+    database:"inventory"
+})
+
+
+// async functions
+const selectAll=async()=>{
+
+   const table=await con.query("SELECT * FROM pc_games")
+   return table
+}
+
+async function getGameType(type){
+    if(type==="all"){
+        type="*"
+    }
+    const {rows}= await con.query(`SELECT ${type} FROM  pc_games`)
+    return rows
+
+}
+function parseIntOrNull(value) {
+  if (value === undefined || value === null) return null
+  const trimmed = value.toString().trim()
+  if (trimmed === "") return null
+  const parsed = parseInt(trimmed, 10)
+  return Number.isNaN(parsed) ? null : parsed
+}
+
+function parseFloatOrNull(value) {
+  if (value === undefined || value === null) return null
+  const trimmed = value.toString().trim()
+  if (trimmed === "") return null
+  const parsed = parseFloat(trimmed)
+  return Number.isNaN(parsed) ? null : parsed
+}
+
+async function search(obj) {
+  if (obj.id) {
+    const result = await con.query(
+      "SELECT * FROM pc_games WHERE id = $1",
+      [obj.id]
+    );
+
+    return result.rows;
+  }
+
+  if (obj.name) {
+    const result = await con.query(
+      "SELECT * FROM pc_games WHERE game_name = $1",
+      [obj.name]
+    );
+
+    return result.rows;
+  }
+
+  if (obj.genre) {
+    const result = await con.query(
+      "SELECT * FROM pc_games WHERE genre = $1",
+      [obj.genre]
+    );
+
+    return result.rows;
+  }
+
+  if (obj.mode) {
+    const result = await con.query(
+      "SELECT * FROM pc_games WHERE game_mode = $1",
+      [obj.mode]
+    );
+
+    return result.rows;
+  }
+
+  return [];
+}
+
+
+
+async function deleteSeach(obj){
+
+
+  const result = await con.query(
+  "SELECT * FROM pc_games WHERE id=$1",
+  [obj.id]
+)
+if (result.rows.length === 0) {
+  console.log("Game not found")
+  return
+}
+const oldGame = result.rows[0]
+   await con.query(`DELETE FROM pc_games WHERE id=$1`, [oldGame.id])
+
+   
+    
+}
+
+async function update(obj) {
+
+
+const result = await con.query(
+  "SELECT * FROM pc_games WHERE id=$1",
+  [obj.id]
+)
+if (result.rows.length === 0) {
+  console.log("Game not found")
+  return
+}
+
+const oldGame = result.rows[0]
+const new_name = obj.name?obj.name : oldGame.name
+const new_genre = obj.genre || oldGame.genre
+const new_game_mode = obj.mode || oldGame.mode
+const new_game_type = obj.type || oldGame.type
+const new_release = obj.release_date || oldGame.release_date
+
+
+    await con.query(
+  `UPDATE pc_games
+   SET game_name=$1,
+       genre=$2,
+       game_mode=$3,
+       game_type=$4,
+       release_date=$5
+   WHERE id=$6`,
+   [
+     new_name,
+     new_genre,
+     new_game_mode,
+     new_game_type,
+     new_release,
+     obj.id
+   ]
+)
+  }
+  
+
+// 
+
+app.get("/",async(req,res)=>{
+const table= await selectAll()
+
+res.render("home",{table:table.rows})
+
+})
+
+
+
+app.post("/",async(req,res)=>{
+   console.log(req.body)
+    const game_type=req.body.type
+    const games= await getGameType(game_type)
+    res.render("specific_games",{games:games,game_type:game_type})
+})
+
+
+
+
+
+app.get("/add_games",(req,res)=>{
+    res.render("add_games")
+})
+app.post("/add_games", async (req, res) => {
+  const { name, genre, type, mode, date, publisher, price, qty, platform, ratings, downloads } = req.body;
+  console.log(req.body)
+
+  const priceValue = parseFloatOrNull(price)
+  const qtyValue = parseIntOrNull(qty)
+  const ratingValue = parseFloatOrNull(ratings)
+  const downloadsValue = parseIntOrNull(downloads)
+
+  try {
+    await con.query(
+      `INSERT INTO pc_games
+       (game_name, genre, game_mode, game_type, release_date, publisher, price, stock_qty, platform, rating, downloads)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+      [name, genre, mode, type, date, publisher, priceValue, qtyValue, platform, ratingValue, downloadsValue]
+    );
+
+    console.log("Package inserted Successfully");
+    res.redirect("/");
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Database error");
+  }
+});
+
+
+
+
+app.get("/search",(req,res)=>{
+    res.render("Search")
+})
+
+app.post("/search", async (req, res) => {
+  const info = await search(req.body);
+
+  if (info.length === 0) {
+    return res.status(404).send("Game not found");
+  }
+
+  res.render("found", { info });
+});
+
+
+app.get("/update",(req,res)=>{
+  res.render("update")
+})
+app.post("/update",async(req,res)=>{
+  console.log(req.body)
+await update(req.body)
+res.redirect("/")
+})
+
+
+
+app.get("/delete",(req,res)=>{
+  res.render("delete")
+})
+app.post("/delete",async(req,res)=>{
+await deleteSeach(req.body)
+res.redirect("/")
+})
+
+
+
+
+
+
+
+
+
+
+const port=1000||2000
+
+app.listen(port,()=>{
+    console.log(`port is running on ${port}.....`)
+})
+
+module.exports=con
+
+
+
+
+
+add_gaems.ejs
+
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+     <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+    
+<form method="post">
+    <div id="name-container">
+        <label for="name">Enter Game Name</label>
+        <input type="text" id="name" name="name" required>
+    </div>
+        <div>
+        <label for="id">Game Genre</label>
+        <select name="genre" id="genre">
+        <option value="action">Action</option>
+        <option value="racing">Racng</option>
+        <option value="sports">Sports</option>
+        <option value="fighting">Fighting</option>
+        <option value="puzzle">puzzle</option>
+        <option value="other">other</option>
+       </select>
+    </div>
+        <label for="id">Game type </label>
+       <select name="type" id="type">
+      
+        <option value="Offline">Ofline Games</option>
+        <option value="online">Online Games</option>
+       </select>
+    </div>
+
+
+    <div>
+        <label for="id">Search By Mode </label>
+       <select name="mode" id="mode">
+      
+        <option value="singleplayer">Single Player</option>
+        <option value="multiplayer">Multiplayer</option>
+       </select>
+    </div>
+
+
+
+    <div id="date-container">
+        <label for="date">Enter Game Release Date</label>
+        <input type="date" id="date" name="date" required>
+    </div>
+
+        <div id="publisher-container">
+        <label for="publisher">Enter Publisher</label>
+        <input type="text" id="publisher" name="publisher" placeholder="Rockstar Games">
+    </div>
+
+        <div id="price-container">
+        <label for="price">Enter Game Price</label>
+        <input type="text" id="price" name="price" >
+    </div>
+
+     <div id="qty-container">
+        <label for="qty">Enter Game Quanity</label>
+        <input type="text" id="qty" name="qty" placeholder="how many games are available" >
+    </div>
+
+     <div id="platform-container">
+        <label for="platform">Enter Game Platform</label>
+        <input type="text" id="platform" name="platform" placeholder="Where to download game" >
+    </div>
+
+     <div id="ratings-container">
+        <label for="ratings">Rate The Game</label>
+        <input type="text" id="ratings" name="ratings" >
+    </div>
+
+     <div id="downloads-container">
+        <label for="downloads">How Many People have Donwloaded the Game</label>
+        <input type="text" id="downloads" name="downloads" >
+    </div>
+
+
+    <button type="submit">Insert Game</button>
+</form>
+
+</body>
+</html>
+
+
+
+
+
+delete.ejs
+
+
+
+<html>
+    <head>
+          <link rel="stylesheet" href="/styles.css">
+    </head>
+    <body>
+<form method="post">
+    <div>
+        <label for="id">Search By Id</label>
+        <input type="text" name="id" id="id"/>
+    </div>
+   
+
+    <button type="submit">Submit</button>
+</form>
+    </body>
+</html>
+
+
+
+
+found.ejs
+
+
+<html>
+<head>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Genre</th>
+                <th>Type</th>
+                <th>Mode</th>
+                <th>Release Date</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <% info.forEach(game => { %>
+                <tr>
+                    <td><%= game.id %></td>
+                    <td><%= game.game_name %></td>
+                    <td><%= game.genre %></td>
+                    <td><%= game.game_type %></td>
+                    <td><%= game.game_mode %></td>
+                    <td><%= game.release_date %></td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+    <a type="button" href="/add_games">Add Games</a>
+    <a href="/Home">Return Home</a>
+</body>
+</html>
+
+
+
+
+
+home.ejs
+
+
+<html>
+<head>
+     <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <table border="1">
+        <thead>
+            <tr>
+                <th class="id">ID</th>
+                <th class="name">Name</th>
+                <th class="genre">Genre</th>
+                <th class="type">Type</th>
+                <th class="mode">Mode</th>
+                <th class="date">Release Date</th>
+                <th class="publisher">Publisher</th>
+                <th class="price">Price</th>
+                <th class="qty">Stock Qty</th>
+                <th class="platform">Platform</th>
+                <th class="rating">Rating</th>
+                <th class="downloads">Downloads</th>
+
+
+
+            </tr>
+        </thead>
+
+        <tbody>
+            <% table.forEach(game => { %>
+                <tr>
+                    <td><%= game.id %></td>
+                    <td><%= game.game_name %></td>
+                    <td><%= game.genre %></td>
+                    <td><%= game.game_type %></td>
+                    <td><%= game.game_mode %></td>
+                    <td><%= game.release_date %></td>
+                    <td><%= game.publisher %></td>
+                    <td><%= game.price %></td>
+                    <td><%= game.stock_qty %></td>
+                    <td><%= game.platform %></td>
+                    <td><%= game.rating %></td>
+                    <td><%= game.downloads %></td>
+
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+    <a type="button" href="/add_games">Add Games</a>
+    <a href="/search">Search Game</a>
+    <a href="/update">Update Game Info</a>
+    <a href="delete">Delete Game</a>
+</body>
+</html>
+
+
+
+
+
+search.ejs
+
+
+
+<html>
+<head>
+     <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<form method="post">
+    <div>
+        <label for="id">Search By Id</label>
+        <input type="text" name="id" id="id"/>
+    </div>
+     <div>
+        <label for="name">Search By Name</label>
+        <input type="text" name="name" id="name"/>
+    </div>
+     <div>
+        <label for="id">Search By Genre</label>
+        <select name="genre" id="genre">
+        <option value="action">Action</option>
+        <option value="racing">Racng</option>
+        <option value="sports">Sports</option>
+        <option value="fighting">Fighting</option>
+        <option value="puzzle">puzzle</option>
+        <option value="other">other</option>
+       </select>
+    </div>
+     <div>
+        <label for="id">Search By type </label>
+       <select name="type" id="type">
+      
+        <option value="Offline">Ofline Games</option>
+        <option value="online">Online Games</option>
+       </select>
+    </div>
+
+
+      <div>
+        <label for="id">Search By Mode </label>
+       <select name="mode" id="mode">
+      
+        <option value="singleplayer">Single Player</option>
+        <option value="multiplayer">Multiplayer</option>
+       </select>
+    </div>
+
+
+
+    <button type="submit">Submit</button>
+</form>
+
+</body>
+</html>
+
+
+
+
+
+
+specific_games.ejs
+
+
+
+<html>
+    <head>
+              <link rel="stylesheet" href="/styles.css">
+    </head>
+    <body>
+        <table>
+            <thead>
+                <tr>
+                          <th>ID</th>
+                <th>Name</th>
+                <th>Genre</th>
+                <th>Type</th>
+                <th>Mode</th>
+                <th>Release Date</th>
+                <th>Publisher</th>
+                <th>Price</th>
+                <th>Stock Qty</th>
+                <th>Platform</th>
+                <th>Rating</th>
+                <th>Downloads</th>
+
+
+
+                </tr>
+            </thead>
+            <tb>
+                <%  games.forEach(game=>{%>
+                    <tr>
+                        <% console.log(game) %>
+                         <td><%= game.id %></td>
+                    <td><%= game.game_name %></td>
+                    <td><%= game.genre %></td>
+                    <td><%= game.game_type %></td>
+                    <td><%= game.game_mode %></td>
+                    <td><%= game.release_date %></td>
+                    <td><%= game.publisher %></td>
+                    <td><%= game.price %></td>
+                    <td><%= game.qty %></td>
+                    <td><%= game.platform %></td>
+                    <td><%= game.ratings %></td>
+                    <td><%= game.publisher %></td>
+                    <td><%= game.downloads %></td>
+
+
+                    </tr>
+
+                <%})%>
+            </tb>
+        </table>
+    </body>
+</html>
+
+
+
+
+
+update.ejs
+
+
+
+
+<html>
+    <head>
+             <link rel="stylesheet" href="/styles.css">
+    </head>
+    <body>
+      
+<form method="post">
+  <h3>Search Game to Update</h3>
+    <div>
+        <label for="id">Search By Id</label>
+        <input type="text" name="id" id="id"/>
+    </div>
+
+      <h3>New Game Info</h3>
+     <div>
+        <label for="name">Search By Name</label>
+        <input type="text" name="name" id="name"/>
+    </div>
+     <div>
+        <label for="id">Search By Genre</label>
+        <select name="genre" id="genre">
+        <option value="action">Action</option>
+        <option value="racing">Racng</option>
+        <option value="sports">Sports</option>
+        <option value="fighting">Fighting</option>
+        <option value="puzzle">puzzle</option>
+        <option value="other">other</option>
+       </select>
+    </div>
+     <div>
+        <label for="id">Search By type </label>
+       <select name="type" id="type">
+      
+        <option value="Offline">Ofline Games</option>
+        <option value="online">Online Games</option>
+       </select>
+    </div>
+
+
+      <div>
+        <label for="id">Search By Mode </label>
+       <select name="mode" id="mode">
+      
+        <option value="singleplayer">Single Player</option>
+        <option value="multiplayer">Multiplayer</option>
+       </select>
+    </div>
+      <div id="date-container">
+        <label for="date">Enter Game Release Date</label>
+        <input type="date" id="date" name="date" required>
+    </div>
+
+
+
+    <button type="submit">Submit</button>
+</form>
+    </body>
+</html>
+
+

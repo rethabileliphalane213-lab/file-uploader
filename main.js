@@ -13,6 +13,7 @@ const signin=require("./routes/signinRuter")
 const login=require("./routes/loginRouter")
 const con=require("./routes/db")
 const upload=require("./routes/uploadRouter")
+const deletee=require("./routes/deleteRouter")
 const { log } = require("node:console")
 
 app.use(express.urlencoded({extended:true}))
@@ -32,6 +33,8 @@ app.use("/",homeRouter)
 app.use("/signin",signin)
 app.use("/login",login)
 app.use("/upload",upload)
+app.use("/delete",deletee)
+
 
 passport.use(new localStrategy({usernameField:"email"},async(email,password,done)=>{
 try{
@@ -51,6 +54,9 @@ return done(null,emailFound)
     return done(error)
 }
 }))
+
+
+
 passport.serializeUser((user,done)=>{
     return done(null,user.user_id)
 })

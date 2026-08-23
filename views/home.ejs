@@ -21,22 +21,38 @@
                 <th class="name">File Name</th>
                 <th class="genre">file Size</th>
                 <th class="type">Date</th>
+                <th class="type">Delete</th>
+             
+
                
             </tr>
         </thead>
+<% if(files.length >0){%>
 
-        <tbody>
+
+<tbody>
             <% files.forEach(file => { %>
                 <tr>
                     <td><%= file.file_name %></td>
                     <td><%= file.file_size %></td>
                     <td><%= file.upload_time %></td>
+                     <td>
+    <form method="POST" action="/delete">
+        <input type="hidden" name="file_id" value="<%= file.file_id %>">
+        <button type="submit">Delete</button>
+    </form>
+</td>>
                  
 
                 </tr>
             <% }) %>
         </tbody>
     </table>
+
+
+
+<%}%>
+        
 
 
 

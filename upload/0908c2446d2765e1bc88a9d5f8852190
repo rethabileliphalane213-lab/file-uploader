@@ -1,0 +1,220 @@
+const openModal=document.getElementById("open-modal")
+const displayModal=document.querySelector(".modal")
+const closeModal=document.getElementById("close")
+const nameInput=document.getElementById("name")
+const emailInput=document.getElementById("email")
+const numberInput=document.getElementById("number")
+const subjectInput=document.getElementById("subject")
+const messageInput=document.getElementById("message")
+const submitBtn=document.getElementById("submit-btn")
+const modalOptions=document.querySelectorAll("#options a")
+const form = document.querySelector("form");
+const menuBtn=document.getElementById("menu")
+
+
+let isVisible=false
+
+function toggleMenu(){
+    isVisible=!isVisible
+    if(isVisible){
+        navOptions.style.display="block"
+        menuBtn.style.border="2px solid gold"
+    }else{
+        navOptions.style.display="none"
+        menuBtn.style.border="2px solid red"
+    }
+}
+
+modalOptions.forEach(option=>{
+    option.addEventListener("click",()=>{
+        isVisible=false
+        navOptions.style.display="none"
+    })
+})
+
+menuBtn.addEventListener("click",()=>{
+    toggleMenu()
+})
+
+
+openModal.addEventListener("click",()=>{
+    displayModal.style.display="flex"
+})
+
+closeModal.addEventListener("click",()=>{
+    displayModal.style.display="none"
+})
+
+submitBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    if (
+        !nameInput.value.trim() ||
+        !emailInput.value.trim() ||
+        !numberInput.value.trim() ||
+        !subjectInput.value.trim() ||
+        !messageInput.value.trim()
+    ) {
+        alert("Please fill in all fields before sending.");
+        return;
+    }
+
+    form.submit();
+});
+
+
+
+
+index.js
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Landing Page</title>
+             <link rel="stylesheet" href="./public/styles.css">
+
+    </head>
+    <body>
+     
+
+    <header>
+    <h2 class="logo">R.L</h2>
+
+    <button id="menu">☰ Menu</button>
+
+    <ul id="options">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#education">Education</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#contacts">Contact</a></li>
+    </ul>
+</header>
+        <div class="modal">
+            <button id="close">Close</button>
+            <div class="modal-container">
+                <h2>Lets Grow Together</h2>
+                <p>I'm a Full Stack Developer with the ability to <span>solve</span>,<span>Build</span>,<span>Style</span>, and <span>Deploy</span> complex projects</p>
+                <p><strong>Looking For:</strong> Internships, Junior Developer roles</p>
+                <p><strong>Based in:</strong> Johhanesburg south, South Africa </p>
+
+                <div id="text-me">
+                    <a href="#contact" class="close">Send Message</a>
+                    <a href="./public/rethabile2026 (1).pdf" class="download">Download Cv</a>
+                </div>
+            </div>
+            
+        </div>
+
+
+        <section id="home">
+            <h1>Hi! I'm Rethabile Liphalane</h1>
+            <p>Self Taught Developer</p>
+            <a href="https://my-personal-portfolio-1-8xa2.onrender.com">My Portfolio </a>
+            <button id="open-modal">Hire Me</button>
+        </section>
+
+        <section id="education">
+            <div>
+                <h1>Education</h1>
+                <div class="education-container">
+                    <p><strong>Formal:</strong> Matric</p>
+                    <p><strong>First coding journey:</strong> FreecodeCamp</p>
+                    <p><strong>improved coding skills:</strong> The Oding Project</p>
+                    <p><strong>Gained more problem solving skills:</strong> Leetcode</p>
+                </div>
+            </div>
+
+            <div>
+                <h2>Experience</h2>
+                <div class="experience-container">
+                    <h3>Web Developer | Codeveda Technologies</h3>
+                    <p><strong>Date: </strong>July 2026 </p>
+                    <p>Selected for intensive Frontend and Backend Development program focusing on production-ready code</p>
+                    <p>Building and deploying 6 web Apllication using HTML,CSS,vanilla Javascript,Node js,REACT and EXPRESS</p>
+                    <li>Implementing responsive Design, DOM Manipulation,Local storage,Form Manipulation,Authentication,Sessions and Api Intergration</li>
+                    <li>Practicing Git Vesion control and depoying projects via Render</li>
+                    <li>Tools: Node.js, Express,postreSQL,or session handling.</li>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills">
+            
+            <div class="skills-container">
+                <h2>Tech Skills</h2>
+
+
+                <div class="catagory-cntainer">
+                    <h3>Front end</h3>
+                    <ul>
+                        <li>HTML and CSS</li>
+                        <li>Javascript ES6</li>
+                        <li>Sass</li>
+                        <li>Boostraps</li>
+                        <li>React</li>
+                    </ul>
+                </div>
+
+                <div class="catagory-container">
+                    <h3>Backend</h3>
+                    <ul>
+                        <li>Node.js</li>
+                        <li>Express.js</li>
+                        <li>REST API</li>
+                        <li>Authentication and authorization</li>
+                        <li>postgreSQL</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="skill-container">
+                <h2>Soft skills</h2>
+                 <p>
+        Beyond technical skills, I bring a strong work ethic, curiosity, and a
+        commitment to continuous improvement. I enjoy collaborating with others,
+        solving challenging problems, and building reliable applications that
+        provide a great user experience.
+    </p>
+
+    <ul>
+        <li>Problem Solving</li>
+        <li>Communication</li>
+        <li> Team Collaboration</li>
+        <li> Adaptability</li>
+        <li> Time Management</li>
+        <li> Critical Thinking</li>
+        <li> Attention to Detail</li>
+        <li> Continuous Learning</li>
+    </ul>
+            </div>
+        </section>
+
+       
+   <section class="contacts" id="contacts">
+    <h2 class="heading">Contact <span>Me</span></h2>
+    <form action="https://formsubmit.co/rethabileliphalane213@gmail.com"  method="POST">
+
+      <div class="input-box">
+        <input type="text" placeholder="Full Name" name="full-name" id="name"/>
+        <input type="email" placeholder="Email" name="email" id="email"/>
+      </div>
+
+      <div class="input-box">
+        <input type="number" placeholder="Phone Number" name="number" id="number"/>
+        <input type="text" placeholder="Subject" name="Subject" id="subject"/>
+      </div>
+
+
+      <textarea placeholder="Your Message" name="msg" id="message"></textarea>
+      <input type="submit" value="Send Message" class="btn"  id="submit-btn"/>
+    </form>
+   </section>
+            <script src="index.js"></script>
+    </body>
+</html>
+
+
+
+
