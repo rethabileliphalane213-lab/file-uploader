@@ -16,6 +16,8 @@ const upload=require("./routes/uploadRouter")
 const deletee=require("./routes/deleteRouter")
 const { log } = require("node:console")
 
+
+app.use("/upload", express.static(path.join(__dirname, "upload")));
 app.use(express.urlencoded({extended:true}))
 app.set("views",path.join(__dirname,"views"))
 app.set("view engine","ejs")

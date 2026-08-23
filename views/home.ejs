@@ -22,6 +22,8 @@
                 <th class="genre">file Size</th>
                 <th class="type">Date</th>
                 <th class="type">Delete</th>
+                <th class="type">Download</th>
+                
              
 
                
@@ -41,7 +43,16 @@
         <input type="hidden" name="file_id" value="<%= file.file_id %>">
         <button type="submit">Delete</button>
     </form>
-</td>>
+</td>
+
+<td>
+    <a 
+ href="/upload/<%=file.file_name %>"
+  download="<%=file.file_name%>"
+  class="btn"
+>Download</a>
+      
+</td>
                  
 
                 </tr>
