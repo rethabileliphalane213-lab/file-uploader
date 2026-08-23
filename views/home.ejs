@@ -2,15 +2,16 @@
       <!DOCTYPE html>
 <html>
     <head>
-         <link rel="stylesheet" href="/guest.css">
+         <link rel="stylesheet" href="/styles.css">
          <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     </head>
   <body>
     <% if(locals.user){ %>
-        <h1>Hello <%= user.name %></h1>
-<a clsas="logout" href="/logout">Log Out</a>
-
+     <div class="top-bar">
+    <h1>Hello <%= user.name %></h1>
+    <a class="logout" href="/logout">Log Out</a>
+</div>
 
 
  
@@ -74,12 +75,37 @@
             <button type="submit">Upload</button>
         </form>
     <%}else{%>
-         <div class="sign-log-container">
+      
+
+
+            <div class="guest-container">
+                <div class="hero">
+                    <h1>Secure File Uploader</h1>
+                    <p>Store,orgonize,and acces you files fom anywhere.Upload Documents,images and more with a simple,secured Dashboad</p>
+
+<div class="features">
+    <div class="feature">
+        <h3>Private & Secure</h3>
+        <p>Each User gets their Own Private staorage.Only yu can see and download your files</p>
+    </div>
+
+    <div class="feature">
+        <h3>Fast Uploads</h3>
+        <p>Drag and dro[ or upload multiple files in seconds.Track File size and upload date</p>
+    </div>
+    <div class="feature">
+        <h3>Easy Management</h3>
+        <p>Download,Delete and organize all you files in one clean dashboard</p>
+    </div>
+</div>
+
+   <div class="sign-log-container">
                 <a href="/login" id="log">Login</a>
           
                 <a href="/signin" id="sign">Sign In</a>
             </div>
-
+                </div>
+            </div>
 
     <%}%>
       
@@ -87,7 +113,7 @@
            
             
 
-    </body>
+    
 
     </body>
     </html>
