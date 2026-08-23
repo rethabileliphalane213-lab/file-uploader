@@ -12,6 +12,7 @@ const homeRouter=require("./routes/homeRoute")
 const signin=require("./routes/signinRuter")
 const login=require("./routes/loginRouter")
 const con=require("./routes/db")
+const upload=require("./routes/uploadRouter")
 const { log } = require("node:console")
 
 app.use(express.urlencoded({extended:true}))
@@ -30,6 +31,7 @@ app.use(passport.session())
 app.use("/",homeRouter)
 app.use("/signin",signin)
 app.use("/login",login)
+app.use("/upload",upload)
 
 passport.use(new localStrategy({usernameField:"email"},async(email,password,done)=>{
 try{

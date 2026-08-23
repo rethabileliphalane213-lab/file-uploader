@@ -9,6 +9,11 @@
   <body>
     <% if(locals.user){ %>
         <h1>Hello <%= user.name %></h1>
+
+        <form method="post" enctype="multipart/form-data" action="/upload">
+            <input type="file" name="file" id="file-upload" />
+            <button type="submit">Upload</button>
+        </form>
     <%}else{%>
          <div class="sign-log-container">
                 <a href="/login" id="log">Login</a>
@@ -19,8 +24,8 @@
 
     <%}%>
       
-           0.
-           0
+           
+           
             
 
     </body>
