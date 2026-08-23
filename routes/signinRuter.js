@@ -25,9 +25,7 @@ if(emailUsed){
 }
 const hashPassword=await bcrypt.hash(password,10)
 await con.query(`INSERT INTO users(name,email,password)VALUES($1,$2,$3)`,[name,email,hashPassword])
-const {rows}=await con.query(`SELECT * FROM users WHERE email=$1`,[email])
-const userId=rows[0].user_id
-await con.query(`INSERT INTO uploads(user_id)VALUES($1)`,[userId])
+
 ////////////////////////////////////////////Prisma Connection//////////////////////////////////////////////////
 /*await prisma.user.create({
     data:{
