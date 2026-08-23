@@ -11,10 +11,36 @@
         <h1>Hello <%= user.name %></h1>
 
 
-    <% files.forEach(file=>{ %>
-<h1><%=file.file_name %></h1>
-<h2><%=file.file_size %>KB</h2>
-    <%})%>
+
+
+ 
+    <table border="1">
+        <thead>
+            <tr>
+            
+                <th class="name">File Name</th>
+                <th class="genre">file Size</th>
+                <th class="type">Date</th>
+               
+            </tr>
+        </thead>
+
+        <tbody>
+            <% files.forEach(file => { %>
+                <tr>
+                    <td><%= file.file_name %></td>
+                    <td><%= file.file_size %></td>
+                    <td><%= file.upload_time %></td>
+                 
+
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+
+
+
+
 
         <form method="post" enctype="multipart/form-data" action="/upload">
             <input type="file" name="file" id="file-upload" />
