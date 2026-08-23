@@ -11,6 +11,7 @@ const bcrypt=require("bcryptjs")
 const homeRouter=require("./routes/homeRoute")
 const signin=require("./routes/signinRuter")
 const login=require("./routes/loginRouter")
+const logout=require("./routes/logoutRouter")
 const con=require("./routes/db")
 const upload=require("./routes/uploadRouter")
 const deletee=require("./routes/deleteRouter")
@@ -36,6 +37,7 @@ app.use("/signin",signin)
 app.use("/login",login)
 app.use("/upload",upload)
 app.use("/delete",deletee)
+app.use("/logout",logout)
 
 
 passport.use(new localStrategy({usernameField:"email"},async(email,password,done)=>{
