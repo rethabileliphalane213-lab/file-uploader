@@ -1,12 +1,8 @@
 const {Pool}=require("pg")
-
-
+require("dotenv")
+console.log(process.env.DATABSE)
 const con=new Pool({
-    password:"rethabilenongs",
-    database:"file-uploader",
-    port:5432,
-    host:"localhost",
-    user:"postgres"
+  connectionString:process.env.DATABASE
 })
 
 

@@ -5,8 +5,8 @@ const session=require("express-session")
 const passport=require("passport")
 const localStrategy=require("passport-local").Strategy
 const bcrypt=require("bcryptjs")
-
-
+require("dotenv").config()
+console.log(process.env.DATABSE)
 
 const homeRouter=require("./routes/homeRoute")
 const signin=require("./routes/signinRuter")
