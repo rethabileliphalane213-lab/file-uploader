@@ -14,6 +14,9 @@ const upload = multer({ storage })
 
 uploadRouter.post("/", upload.single("file"), async (req, res) => {
     const file = req.file
+   if (!file) {
+    return res.redirect("/")
+}
 
     console.log(file)
     console.log(req.user)
