@@ -1,5 +1,5 @@
 const {Pool}=require("pg")
-require("dotenv")
+require("dotenv").config()
 console.log(process.env.DATABSE)
 const con=new Pool({
   connectionString:process.env.DATABASE
